@@ -5,17 +5,18 @@ import {
   Response,
   Request,
   NextFunction,
-} from "express";
-import http from "http";
-import cors from "cors";
-import helmet from "helmet";
-import hpp from "hpp";
-import compression from "compression";
-import cookieSession from "cookie-session";
-import HTTP_STATUS from "http-status-codes";
-import "express-async-errors";
+} from 'express';
+import http from 'http';
+import cors from 'cors';
+import helmet from 'helmet';
+import hpp from 'hpp';
+import compression from 'compression';
+import cookieSession from 'cookie-session';
+import HTTP_STATUS from 'http-status-codes';
+import 'express-async-errors';
+import { config } from './config';
 
-const SERVER_PORT = 5000;
+const SERVER_PORT = 6000;
 
 export class ChattyServer {
   private app: Application;
@@ -35,28 +36,28 @@ export class ChattyServer {
   private securityMiddleware(app: Application): void {
     app.use(
       cookieSession({
-        name: "session",
-        keys: ["test1", "test2"],
+        name: 'session',
+        keys: [config.SECRET_KEY_ONE!, config.SECRET_KEY_TWO!],
         maxAge: 24 * 7 * 3600000, // 7 days
-        secure: false,
+        secure: config.NODE_ENV !== 'development',
       })
     );
     app.use(hpp());
     app.use(helmet());
     app.use(
       cors({
-        origin: "*",
+        origin: config.CLIENT_URL,
         credentials: true,
         optionsSuccessStatus: 200,
-        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       })
     );
   }
 
   private standardMiddleware(app: Application): void {
     app.use(compression());
-    app.use(json({ limit: "50mb" }));
-    app.use(urlencoded({ extended: true, limit: "50mb" }));
+    app.use(json({ limit: '50mb' }));
+    app.use(urlencoded({ extended: true, limit: '50mb' }));
   }
 
   private routeMiddleware(app: Application): void {}
