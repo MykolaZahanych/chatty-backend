@@ -16,11 +16,17 @@ import HTTP_STATUS from 'http-status-codes';
 import { Server } from 'socket.io';
 import { createClient } from 'redis';
 import { createAdapter } from '@socket.io/redis-adapter';
+import Logger from 'bunyan';
 import 'express-async-errors';
 import { config } from './config';
 import applicationsRoutes from './routes';
+import {
+  CustomError,
+  IErrorResponse,
+} from './shared/globals/helpers/error-handler';
 
 const SERVER_PORT = 6000;
+const log: Logger = config.createLogger('server');
 
 export class ChattyServer {
   private app: Application;
@@ -68,7 +74,28 @@ export class ChattyServer {
     applicationsRoutes(app);
   }
 
-  private globalErrorHandler(app: Application): void {}
+  private globalErrorHandler(app: Application): void {
+    app.all('*', (req: Request, res: Response) => {
+      res
+        .status(HTTP_STATUS.NOT_FOUND)
+        .json({ message: `${req.originalUrl} not found.` });
+    });
+
+    app.use(
+      (
+        error: IErrorResponse,
+        req: Request,
+        res: Response,
+        next: NextFunction
+      ) => {
+        log.error(error);
+        if (error instanceof CustomError) {
+          return res.status(error.statusCode).json(error.serializeErrors());
+        }
+        next();
+      }
+    );
+  }
 
   private async startServer(app: Application): Promise<void> {
     try {
@@ -77,7 +104,7 @@ export class ChattyServer {
       const socketIO: Server = await this.createSocketIO(httpServer);
       this.socketIOConnections(socketIO);
     } catch (error) {
-      console.log(error);
+      log.error(error);
     }
   }
 
@@ -98,7 +125,7 @@ export class ChattyServer {
 
   private startHttpServer(httpServer: http.Server): void {
     httpServer.listen(SERVER_PORT, () => {
-      console.log(`Server running on port ${SERVER_PORT}`);
+      log.info(`Server running on port ${SERVER_PORT}`);
     });
   }
 
