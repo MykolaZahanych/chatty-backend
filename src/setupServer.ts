@@ -18,12 +18,9 @@ import { createClient } from 'redis';
 import { createAdapter } from '@socket.io/redis-adapter';
 import Logger from 'bunyan';
 import 'express-async-errors';
-import { config } from './config';
-import applicationsRoutes from './routes';
-import {
-  CustomError,
-  IErrorResponse,
-} from './shared/globals/helpers/error-handler';
+import { config } from '@root/config';
+import applicationsRoutes from '@root/routes';
+import { CustomError, IErrorResponse } from '@globals/helpers/error-handler';
 
 const SERVER_PORT = 6000;
 const log: Logger = config.createLogger('server');
