@@ -24,6 +24,7 @@
       { "transform": "typescript-transform-paths", "afterDeclarations": true }
     ],
     "paths": {
+      "@user/*": ["src/features/user/*"],
       "@auth/*": ["src/features/auth/*"],
       "@globals/*": ["src/shared/globals/*"],
       "@service/*": ["src/shared/services/*"],
