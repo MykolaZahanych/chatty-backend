@@ -22,7 +22,7 @@ import { config } from '@root/config';
 import applicationsRoutes from '@root/routes';
 import { CustomError, IErrorResponse } from '@globals/helpers/error-handler';
 
-const SERVER_PORT = 6000;
+const SERVER_PORT = 4000;
 const log: Logger = config.createLogger('server');
 
 export class ChattyServer {
