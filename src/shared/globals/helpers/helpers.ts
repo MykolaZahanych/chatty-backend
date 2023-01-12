@@ -3,10 +3,7 @@ export class Helpers {
     const valueString = str.toLowerCase();
     return valueString
       .split(' ')
-      .map(
-        (value: string) =>
-          `${value.charAt(0).toUpperCase()}${value.slice(1).toLowerCase()}`
-      )
+      .map((value: string) => `${value.charAt(0).toUpperCase()}${value.slice(1).toLowerCase()}`)
       .join(' ');
   }
 
@@ -24,5 +21,13 @@ export class Helpers {
     }
 
     return parseInt(result, 10);
+  }
+
+  static parseJson(prop: string): any {
+    try {
+      JSON.parse(prop);
+    } catch (err) {
+      return prop;
+    }
   }
 }
