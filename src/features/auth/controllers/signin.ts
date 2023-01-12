@@ -14,23 +14,17 @@ export class SignIn {
   @joiValidation(loginSchema)
   public async read(req: Request, res: Response): Promise<void> {
     const { username, password } = req.body;
-    const existingUser: IAuthDocument = await authService.getAuthUserByUsername(
-      username
-    );
+    const existingUser: IAuthDocument = await authService.getAuthUserByUsername(username);
     if (!existingUser) {
       throw new BadRequestError('Invalid credentials');
     }
 
-    const passwordsMatch: boolean = await existingUser.comparePassword(
-      password
-    );
+    const passwordsMatch: boolean = await existingUser.comparePassword(password);
     if (!passwordsMatch) {
       throw new BadRequestError('Invalid credentials');
     }
 
-    const user: IUserDocument = await userService.getUserByAuthId(
-      `${existingUser._id}`
-    );
+    const user: IUserDocument = await userService.getUserByAuthId(`${existingUser._id}`);
 
     const userJwt: string = JWT.sign(
       {

@@ -10,14 +10,7 @@ class UserService {
   public async getUserByAuthId(authId: string): Promise<IUserDocument> {
     const users: IUserDocument[] = await UserModel.aggregate([
       { $match: { authId: new mongoose.Types.ObjectId(authId) } },
-      {
-        $lookup: {
-          from: 'Auth',
-          localField: 'authId',
-          foreignField: '_id',
-          as: 'authId',
-        },
-      },
+      { $lookup: { from: 'Auth', localField: 'authId', foreignField: '_id', as: 'authId' } },
       { $unwind: '$authId' },
       { $project: this.aggregateProject() },
     ]);
