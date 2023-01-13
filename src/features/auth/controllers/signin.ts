@@ -9,6 +9,7 @@ import { loginSchema } from '@auth/schemas/signin';
 import { IAuthDocument } from '@auth/interfaces/auth.interface';
 import { IUserDocument } from '@user/interfaces/user.interface';
 import { userService } from '@service/db/user.service';
+import { mailTransport } from '@service/emails/mail.transport';
 
 export class SignIn {
   @joiValidation(loginSchema)
@@ -24,11 +25,11 @@ export class SignIn {
       throw new BadRequestError('Invalid credentials');
     }
 
-    const user: IUserDocument = await userService.getUserByAuthId(`${existingUser._id}`);
+    // const user: IUserDocument = await userService.getUserByAuthId(`${existingUser._id}`);
 
     const userJwt: string = JWT.sign(
       {
-        userId: user._id,
+        userId: existingUser._id,
         uId: existingUser.uId,
         email: existingUser.email,
         username: existingUser.username,
@@ -36,21 +37,28 @@ export class SignIn {
       },
       config.JWT_TOKEN!
     );
+
+    await mailTransport.sendEmail(
+      'geoffrey.gulgowski30@ethereal.email',
+      'Testing development email',
+      'This testing mail just for check if this work'
+    );
+
     req.session = { jwt: userJwt };
 
-    const userDocument: IUserDocument = {
-      ...user,
-      authId: existingUser!._id,
-      username: existingUser!.username,
-      email: existingUser!.email,
-      avatarColor: existingUser!.avatarColor,
-      uId: existingUser!.uId,
-      createdAt: existingUser!.createdAt,
-    } as IUserDocument;
+    // const userDocument: IUserDocument = {
+    //   ...user,
+    //   authId: existingUser!._id,
+    //   username: existingUser!.username,
+    //   email: existingUser!.email,
+    //   avatarColor: existingUser!.avatarColor,
+    //   uId: existingUser!.uId,
+    //   createdAt: existingUser!.createdAt,
+    // } as IUserDocument;
 
     res.status(HTTP_STATUS.OK).json({
       message: 'User login successfully',
-      user: userDocument,
+      user: existingUser,
       token: userJwt,
     });
   }

@@ -5,8 +5,9 @@ import { BullAdapter } from '@bull-board/api/bullAdapter';
 import { ExpressAdapter } from '@bull-board/express';
 import { config } from '@root/config';
 import { IAuthJob } from '@auth/interfaces/auth.interface';
+import { IEmailJob } from '@user/interfaces/user.interface';
 
-type IBaseJobData = IAuthJob;
+type IBaseJobData = IAuthJob | IEmailJob;
 
 let bullAdapters: BullAdapter[] = [];
 
@@ -52,11 +53,7 @@ export abstract class BaseQueue {
     });
   }
 
-  protected processJob(
-    name: string,
-    concurrency: number,
-    callback: Queue.ProcessCallbackFunction<void>
-  ): void {
+  protected processJob(name: string, concurrency: number, callback: Queue.ProcessCallbackFunction<void>): void {
     this.queue.process(name, concurrency, callback);
   }
 }
